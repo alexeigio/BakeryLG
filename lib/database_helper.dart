@@ -45,6 +45,14 @@ class DatabaseHelper {
       )
     ''');
 
+    // Inserta categorías predefinidas
+    await db.insert('categorias', {'nombre': 'Pasteles'});
+    await db.insert('categorias', {'nombre': 'Galletas'});
+    await db.insert('categorias', {'nombre': 'Pan'});
+    await db.insert('categorias', {'nombre': 'Postres'});
+    await db.insert('categorias', {'nombre': 'Postres veganos'});
+    // ...puedes agregar más si lo deseas...
+
     await db.execute('''
       CREATE TABLE productos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
