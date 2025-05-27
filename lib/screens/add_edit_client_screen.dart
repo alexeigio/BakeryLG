@@ -79,6 +79,40 @@ class _AddEditClientScreenState extends State<AddEditClientScreen> {
                 },
                 child: Text('Guardar'),
               ),
+              if (widget.client != null && widget.client!['id'] != null) ...[
+                SizedBox(height: 16),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                  ),
+                  icon: Icon(Icons.delete),
+                  label: Text('Eliminar'),
+                  onPressed: () async {
+                    final confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text('Eliminar cliente'),
+                        content: Text('¿Estás seguro de eliminar este cliente?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: Text('Cancelar'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: Text('Eliminar'),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (confirm == true) {
+                      await Provider.of<ClientsProvider>(context, listen: false)
+                          .deleteClient(widget.client!['id']);
+                      Navigator.pop(context);
+                    }
+                  },
+                ),
+              ],
             ],
           ),
         ),
