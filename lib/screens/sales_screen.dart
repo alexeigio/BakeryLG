@@ -4,6 +4,7 @@ import 'package:bakery_app/screens/sale_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:intl/intl.dart';
 
 class SalesScreen extends StatefulWidget {
   @override
@@ -13,6 +14,7 @@ class SalesScreen extends StatefulWidget {
 class _SalesScreenState extends State<SalesScreen> with SingleTickerProviderStateMixin {
   TabController? _tabController;
   String _filter = 'Todos';
+  String _searchQuery = '';
 
   @override
   void initState() {
@@ -31,7 +33,10 @@ class _SalesScreenState extends State<SalesScreen> with SingleTickerProviderStat
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Pedidos'),
+        title: Text('Pedidos', style: TextStyle(fontWeight: FontWeight.w600)),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
         bottom: TabBar(
           controller: _tabController,
           tabs: [
@@ -40,6 +45,7 @@ class _SalesScreenState extends State<SalesScreen> with SingleTickerProviderStat
           ],
         ),
       ),
+      backgroundColor: Color(0xFFF7F7F7),
       body: TabBarView(
         controller: _tabController,
         children: [
@@ -52,7 +58,11 @@ class _SalesScreenState extends State<SalesScreen> with SingleTickerProviderStat
           context,
           MaterialPageRoute(builder: (context) => NewSaleScreen()),
         ),
-        child: Icon(Icons.add),
+        backgroundColor: Colors.black87,
+        child: Icon(Icons.add, color: Colors.white),
+        tooltip: 'Agregar pedido',
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
     );
   }
@@ -61,16 +71,50 @@ class _SalesScreenState extends State<SalesScreen> with SingleTickerProviderStat
     return Consumer<SalesProvider>(
       builder: (context, provider, child) {
         final sales = provider.sales.where((sale) {
-          if (_filter == 'Todos') return true;
-          return sale.estado == _filter;
+          if (_filter != 'Todos' && sale.estado != _filter) return false;
+          if (_searchQuery.isNotEmpty &&
+              !sale.clienteNombre.toLowerCase().contains(_searchQuery.toLowerCase())) {
+            return false;
+          }
+          return true;
         }).toList();
 
         return Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: DropdownButton<String>(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: TextField(
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value;
+                  });
+                },
+                decoration: InputDecoration(
+                  hintText: 'Buscar por cliente',
+                  prefixIcon: Icon(Icons.search, color: Colors.grey),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              child: DropdownButtonFormField<String>(
                 value: _filter,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
                 onChanged: (value) {
                   setState(() {
                     _filter = value!;
@@ -86,29 +130,83 @@ class _SalesScreenState extends State<SalesScreen> with SingleTickerProviderStat
               ),
             ),
             Expanded(
-              child: ListView.builder(
-                itemCount: sales.length,
-                itemBuilder: (context, index) {
-                  final sale = sales[index];
-                  return ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: sale.estado == 'Pendiente'
-                          ? Colors.green
-                          : sale.estado == 'Cancelado'
-                              ? Colors.red
-                              : Colors.grey,
-                    ),
-                    title: Text(sale.clienteNombre),
-                    subtitle: Text('Entrega: ${sale.fechaEntrega}'),
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SaleDetailScreen(sale: sale),
+              child: sales.isEmpty
+                  ? Center(
+                      child: Text(
+                        'No hay pedidos',
+                        style: TextStyle(color: Colors.grey, fontSize: 16),
                       ),
+                    )
+                  : ListView.separated(
+                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      itemCount: sales.length,
+                      separatorBuilder: (_, __) => SizedBox(height: 8),
+                      itemBuilder: (context, index) {
+                        final sale = sales[index];
+                        Color estadoColor;
+                        if (sale.estado == 'Pendiente') {
+                          estadoColor = Colors.orange[700]!;
+                        } else if (sale.estado == 'Completado') {
+                          estadoColor = Colors.green;
+                        } else if (sale.estado == 'Cancelado') {
+                          estadoColor = Colors.red;
+                        } else {
+                          estadoColor = Colors.grey;
+                        }
+                        return Card(
+                          elevation: 1,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: ListTile(
+                            contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                            title: Text(
+                              sale.clienteNombre,
+                              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(height: 2),
+                                Text(
+                                  'Entrega: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(sale.fechaEntrega))}',
+                                  style: TextStyle(color: Colors.grey[700]),
+                                ),
+                                SizedBox(height: 2),
+                                Text(
+                                  'Estado: ${sale.estado}',
+                                  style: TextStyle(
+                                    color: estadoColor,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                if (sale.detalles.isNotEmpty) ...[
+                                  SizedBox(height: 6),
+                                  Text(
+                                    'Productos:',
+                                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+                                  ),
+                                  ...sale.detalles.map((detalle) => Padding(
+                                    padding: const EdgeInsets.only(left: 8.0, top: 2),
+                                    child: Text(
+                                      '- ${detalle['nombre_producto'] ?? detalle['producto_id']} x${detalle['cantidad']}',
+                                      style: TextStyle(fontSize: 13, color: Colors.grey[800]),
+                                    ),
+                                  )),
+                                ],
+                              ],
+                            ),
+                            trailing: Icon(Icons.chevron_right, color: Colors.grey[400]),
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SaleDetailScreen(sale: sale),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
           ],
         );
@@ -134,9 +232,9 @@ class _SalesScreenState extends State<SalesScreen> with SingleTickerProviderStat
                   children: events.map<Widget>((event) {
                     final sale = event as Sale;
                     Color color = Colors.black;
-                    if (sale.estado == 'Pendiente') color = Colors.green;
+                    if (sale.estado == 'Pendiente') color = Colors.orange[700]!;
                     if (sale.estado == 'Cancelado') color = Colors.red;
-                    if (sale.estado == 'Completado') color = Colors.grey;
+                    if (sale.estado == 'Completado') color = Colors.green;
                     return Container(
                       margin: const EdgeInsets.symmetric(horizontal: 1.5),
                       decoration: BoxDecoration(
@@ -165,32 +263,88 @@ class _SalesScreenState extends State<SalesScreen> with SingleTickerProviderStat
                     child: Column(
                       children: [
                         AppBar(
-                          title: Text('Pedidos del ${selectedDay.toString().split(' ')[0]}'),
+                          title: Text('Pedidos del ${DateFormat('dd/MM/yyyy').format(selectedDay)}'),
                           leading: IconButton(
                             icon: Icon(Icons.close),
                             onPressed: () => Navigator.pop(context),
                           ),
                         ),
                         Expanded(
-                          child: ListView.builder(
-                            itemCount: sales.length,
-                            itemBuilder: (context, index) {
-                              final sale = sales[index];
-                              return ListTile(
-                                title: Text(sale.clienteNombre),
-                                subtitle: Text('Estado: ${sale.estado}'),
-                                onTap: () {
-                                  Navigator.pop(context);
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => SaleDetailScreen(sale: sale),
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                          ),
+                          child: sales.isEmpty
+                              ? Center(
+                                  child: Text(
+                                    'No hay pedidos para este día',
+                                    style: TextStyle(color: Colors.grey, fontSize: 16),
+                                  ),
+                                )
+                              : ListView.separated(
+                                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  itemCount: sales.length,
+                                  separatorBuilder: (_, __) => SizedBox(height: 8),
+                                  itemBuilder: (context, index) {
+                                    final sale = sales[index];
+                                    Color estadoColor;
+                                    if (sale.estado == 'Pendiente') {
+                                      estadoColor = Colors.orange[700]!;
+                                    } else if (sale.estado == 'Completado') {
+                                      estadoColor = Colors.green;
+                                    } else if (sale.estado == 'Cancelado') {
+                                      estadoColor = Colors.red;
+                                    } else {
+                                      estadoColor = Colors.grey;
+                                    }
+                                    return Card(
+                                      elevation: 1,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: ListTile(
+                                        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                        title: Text(
+                                          sale.clienteNombre,
+                                          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                                        ),
+                                        subtitle: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            SizedBox(height: 2),
+                                            Text(
+                                              'Estado: ${sale.estado}',
+                                              style: TextStyle(
+                                                color: estadoColor,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            if (sale.detalles.isNotEmpty) ...[
+                                              SizedBox(height: 6),
+                                              Text(
+                                                'Productos:',
+                                                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+                                              ),
+                                              ...sale.detalles.map((detalle) => Padding(
+                                                padding: const EdgeInsets.only(left: 8.0, top: 2),
+                                                child: Text(
+                                                  '- ${detalle['nombre_producto'] ?? detalle['producto_id']} x${detalle['cantidad']}',
+                                                  style: TextStyle(fontSize: 13, color: Colors.grey[800]),
+                                                ),
+                                              )),
+                                            ],
+                                          ],
+                                        ),
+                                        trailing: Icon(Icons.chevron_right, color: Colors.grey[400]),
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => SaleDetailScreen(sale: sale),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    );
+                                  },
+                                ),
                         ),
                       ],
                     ),

@@ -55,17 +55,39 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
-          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Pedidos'),
-          BottomNavigationBarItem(icon: Icon(Icons.cake), label: 'Productos'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Clientes'),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-        onTap: _onItemTapped,
+      bottomNavigationBar: ClipRRect(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+        child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          selectedFontSize: 13,
+          unselectedFontSize: 12,
+          iconSize: 28,
+          selectedItemColor: Colors.blue[700],
+          unselectedItemColor: Colors.grey[400],
+          showUnselectedLabels: true,
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_rounded),
+              label: 'Inicio',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.list_alt_rounded),
+              label: 'Pedidos',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.cake_rounded),
+              label: 'Productos',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_rounded),
+              label: 'Clientes',
+            ),
+          ],
+        ),
       ),
     );
   }

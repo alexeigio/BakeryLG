@@ -14,7 +14,6 @@ class _ClientsScreenState extends State<ClientsScreen> {
   @override
   void initState() {
     super.initState();
-    // Cargar clientes al iniciar la pantalla
     Future.microtask(() =>
       Provider.of<ClientsProvider>(context, listen: false).fetchClients()
     );
@@ -30,47 +29,84 @@ class _ClientsScreenState extends State<ClientsScreen> {
     }).toList();
 
     return Scaffold(
-      appBar: AppBar(title: Text('Clientes')),
+      appBar: AppBar(
+        title: Text('Clientes', style: TextStyle(fontWeight: FontWeight.w600)),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
+      ),
+      backgroundColor: Color(0xFFF7F7F7),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: TextField(
               onChanged: (value) {
                 setState(() {
                   _searchQuery = value;
                 });
               },
-              decoration: InputDecoration(labelText: 'Buscar cliente'),
+              decoration: InputDecoration(
+                hintText: 'Buscar cliente',
+                prefixIcon: Icon(Icons.search, color: Colors.grey),
+                filled: true,
+                fillColor: Colors.white,
+                contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: filteredClients.length,
-              itemBuilder: (context, index) {
-                final client = filteredClients[index];
-                return ListTile(
-                  title: Text(client.nombre),
-                  subtitle: Text(client.contacto ?? 'Sin contacto'),
-                  onTap: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AddEditClientScreen(
-                          client: {
-                            'id': client.id,
-                            'nombre': client.nombre,
-                            'contacto': client.contacto,
+            child: filteredClients.isEmpty
+                ? Center(
+                    child: Text(
+                      'No hay clientes',
+                      style: TextStyle(color: Colors.grey, fontSize: 16),
+                    ),
+                  )
+                : ListView.separated(
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    itemCount: filteredClients.length,
+                    separatorBuilder: (_, __) => SizedBox(height: 8),
+                    itemBuilder: (context, index) {
+                      final client = filteredClients[index];
+                      return Card(
+                        elevation: 1,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: ListTile(
+                          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                          title: Text(
+                            client.nombre,
+                            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                          ),
+                          subtitle: client.contacto != null && client.contacto!.isNotEmpty
+                              ? Text(client.contacto!, style: TextStyle(color: Colors.grey[700]))
+                              : Text('Sin contacto', style: TextStyle(color: Colors.grey[400])),
+                          trailing: Icon(Icons.chevron_right, color: Colors.grey[400]),
+                          onTap: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AddEditClientScreen(
+                                  client: {
+                                    'id': client.id,
+                                    'nombre': client.nombre,
+                                    'contacto': client.contacto,
+                                  },
+                                ),
+                              ),
+                            );
+                            Provider.of<ClientsProvider>(context, listen: false).fetchClients();
                           },
                         ),
-                      ),
-                    );
-                    // Recarga la lista después de editar
-                    Provider.of<ClientsProvider>(context, listen: false).fetchClients();
-                  },
-                );
-              },
-            ),
+                      );
+                    },
+                  ),
           ),
         ],
       ),
@@ -79,7 +115,11 @@ class _ClientsScreenState extends State<ClientsScreen> {
           context,
           MaterialPageRoute(builder: (context) => AddEditClientScreen()),
         ),
-        child: Icon(Icons.add),
+        backgroundColor: Colors.black87,
+        child: Icon(Icons.add, color: Colors.white),
+        tooltip: 'Agregar cliente',
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
     );
   }
