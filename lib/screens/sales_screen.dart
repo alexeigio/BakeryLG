@@ -32,19 +32,29 @@ class _SalesScreenState extends State<SalesScreen> with SingleTickerProviderStat
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Pedidos', style: TextStyle(fontWeight: FontWeight.w600)),
-        elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: [
-            Tab(text: 'Listado'),
-            Tab(text: 'Calendario'),
-          ],
-        ),
-      ),
+    appBar: AppBar(
+      centerTitle: true, // Centra el título
+      title: Text(
+        'Pedidos',
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontFamily: 'Title', // Usa tu fuente personalizada aquí
+          fontSize: 35, // Más grande
+          letterSpacing: 1.2,
+          color: Colors.black87,
+    ),
+  ),
+  elevation: 0,
+  backgroundColor: Colors.white,
+  foregroundColor: Colors.black87,
+  bottom: TabBar(
+    controller: _tabController,
+    tabs: [
+      Tab(text: 'Listado'),
+      Tab(text: 'Calendario'),
+    ],
+  ),
+),
       backgroundColor: Color(0xFFF7F7F7),
       body: TabBarView(
         controller: _tabController,

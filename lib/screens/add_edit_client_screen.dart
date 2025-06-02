@@ -36,7 +36,17 @@ class _AddEditClientScreenState extends State<AddEditClientScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.client == null ? 'Agregar Cliente' : 'Editar Cliente'),
+        centerTitle: true,
+        title: Text(
+          widget.client == null ? 'Agregar Cliente' : 'Editar Cliente',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Title', // Usa tu fuente personalizada aquí
+            fontSize: 35, // Más grande
+            letterSpacing: 1.2,
+            color: Colors.black87,
+          ),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         foregroundColor: Colors.black87,
@@ -97,10 +107,12 @@ class _AddEditClientScreenState extends State<AddEditClientScreen> {
                             };
 
                             if (widget.client != null && widget.client!['id'] != null) {
+                              // EDITAR CLIENTE
                               clientMap['id'] = widget.client!['id'];
                               await Provider.of<ClientsProvider>(context, listen: false)
                                   .updateClient(clientMap);
                             } else {
+                              // AGREGAR CLIENTE
                               await Provider.of<ClientsProvider>(context, listen: false)
                                   .addClient(clientMap);
                             }

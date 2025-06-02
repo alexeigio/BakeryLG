@@ -33,7 +33,17 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.product == null ? 'Agregar Producto' : 'Editar Producto'),
+        centerTitle: true,
+        title: Text(
+          widget.product == null ? 'Agregar Producto' : 'Editar Producto',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Title', // Usa tu fuente personalizada aquí
+            fontSize: 35, // Más grande
+            letterSpacing: 1.2,
+            color: Colors.black87,
+          ),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         foregroundColor: Colors.black87,

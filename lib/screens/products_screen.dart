@@ -31,12 +31,22 @@ class _ProductsScreenState extends State<ProductsScreen> {
     }).toList();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Productos', style: TextStyle(fontWeight: FontWeight.w600)),
-        elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
-      ),
+    appBar: AppBar(
+      centerTitle: true,
+      title: Text(
+        'Productos',
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontFamily: 'Title', // Usa tu fuente personalizada aquí
+          fontSize: 35, // Más grande
+          letterSpacing: 1.2,
+          color: Colors.black87,
+    ),
+  ),
+  elevation: 0,
+  backgroundColor: Colors.white,
+  foregroundColor: Colors.black87,
+),
       backgroundColor: Color(0xFFF7F7F7),
       body: Column(
         children: [

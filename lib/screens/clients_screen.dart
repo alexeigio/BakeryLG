@@ -30,7 +30,17 @@ class _ClientsScreenState extends State<ClientsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Clientes', style: TextStyle(fontWeight: FontWeight.w600)),
+        centerTitle: true,
+        title: Text(
+          'Clientes',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Title', // Usa tu fuente personalizada aquí
+            fontSize: 35, // Más grande
+            letterSpacing: 1.2,
+            color: Colors.black87,
+          ),
+        ),
         elevation: 0,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,

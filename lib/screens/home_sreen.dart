@@ -14,17 +14,31 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
+      /*appBar: AppBar(
         title: Text('Inicio', style: TextStyle(fontWeight: FontWeight.w600)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: Colors.black87,
-      ),
+      ),*/
       backgroundColor: Color(0xFFF7F7F7),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 36.0),
+              child: Text(
+                "Alexei´s Bakery",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: "AlexeisFont", // Cambia esto por el nombre real de tu font en pubspec.yaml
+                  fontSize: 38,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ),
             _HomeStatCard(
               icon: Icons.pending_actions,
               iconColor: Colors.orange[700]!,
